@@ -74,7 +74,38 @@ public class BrowserTokenProvider: TokenProvider {
       }
     }
   }
+  public init?(credentialsurl: URL, tokenurl: URL?) {
+    // let path = ProcessInfo.processInfo.environment["HOME"]!
+    //   + "/.credentials/" + credentials
+    // let credentialsurl = URL(fileURLWithPath: path)
 
+    guard let credentialsData = try? Data(contentsOf: credentialsurl) else {
+      print("No credentials data at \(path).")
+      return nil
+    }
+    let decoder = JSONDecoder()
+    guard let credentials = try? decoder.decode(Credentials.self,
+                                                from: credentialsData)
+    else {
+      print("Error reading credentials")
+      return nil
+    }
+    self.credentials = credentials
+
+    if tokenurl != nil {
+      do {
+        let data = try Data(contentsOf: tokenurl)
+        let decoder = JSONDecoder()
+        guard let token = try? decoder.decode(Token.self, from: data)
+        else {
+          return nil
+        }
+        self.token = token
+      } catch {
+        // ignore errors due to missing token files
+      }
+    }
+  }
   public func saveToken(_ filename: String) throws {
     if let token = token {
       try token.save(filename)
