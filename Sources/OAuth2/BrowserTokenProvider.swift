@@ -80,7 +80,7 @@ public class BrowserTokenProvider: TokenProvider {
     // let credentialsurl = URL(fileURLWithPath: path)
 
     guard let credentialsData = try? Data(contentsOf: credentialsurl) else {
-      print("No credentials data at \(path).")
+      print("No credentials data at \(credentialsurl.absoluteURL).")
       return nil
     }
     let decoder = JSONDecoder()
@@ -94,7 +94,7 @@ public class BrowserTokenProvider: TokenProvider {
 
     if tokenurl != nil {
       do {
-        let data = try Data(contentsOf: tokenurl)
+        let data = try Data(contentsOf: tokenurl!)
         let decoder = JSONDecoder()
         guard let token = try? decoder.decode(Token.self, from: data)
         else {
